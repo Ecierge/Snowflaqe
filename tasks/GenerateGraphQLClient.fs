@@ -93,11 +93,30 @@ type public GenerateGraphQLClient() =
                     this.GeneratedFiles |> Seq.iter (this.Log.LogMessage)
                     0
             else validationCode
+      
+        writer.Flush() 
+        buffer.Seek(0L, SeekOrigin.Begin) |> ignore
+        let reader = new StreamReader(buffer)
+        let mutable prevCh = Unchecked.defaultof<char>
+        while not(reader.EndOfStream) do
+            let line = reader.ReadLine()
+            let rec processLine ch =
+                match ch with
+                | '⏳' -> 
+                    prevCh <- ch
+                    this.Log.LogMessage(Microsoft.Build.Framework.MessageImportance.High, line)
+                | '❌' -> 
+                    prevCh <- ch
+                    this.Log.LogError(line)
+                | '✔' -> 
+                    prevCh <- ch
+                    this.Log.LogMessage(Microsoft.Build.Framework.MessageImportance.High, line)
+                | ' ' -> 
+                    processLine prevCh
+                | _ -> 
+                    this.Log.LogMessage(line)
 
-        if executionCode <> 0 then
-            buffer.Seek(0L, SeekOrigin.Begin) |> ignore
-            let reader = new StreamReader(buffer)
-            while not(reader.EndOfStream) do
-                reader.ReadLine() |> this.Log.LogError
-
+            if not (String.IsNullOrWhiteSpace line) then
+                processLine line.[0]
+             
         executionCode = 0

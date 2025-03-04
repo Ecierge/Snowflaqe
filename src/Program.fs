@@ -218,22 +218,22 @@ let readConfig (file: string) =
 let validateAndPrint (queryFile: string) (document: GraphqlDocument) (schema: GraphqlSchema) =
     match Query.validate document schema with
     | ValidationResult.Success ->
-        colorprintfn "✔️  Query $blue[%s] is valid" queryFile
+        colorprintfn "✔ Query $blue[%s] is valid" queryFile
         true
     | ValidationResult.SchemaDoesNotHaveQueryType ->
-        colorprintfn "⚠️  Error while validating query $red[%s]" queryFile
-        colorprintfn "    Schema doesn't implement a Query type"
+        colorprintfn "❌ Error while validating query $red[%s]" queryFile
+        colorprintfn "   Schema doesn't implement a Query type"
         false
     | ValidationResult.SchemaDoesNotHaveMutationType ->
-        colorprintfn "⚠️  Error while validating query $red[%s]" queryFile
-        colorprintfn "    Schema doesn't implement a Mutation type"
+        colorprintfn "❌ Error while validating query $red[%s]" queryFile
+        colorprintfn "   Schema doesn't implement a Mutation type"
         false
     | ValidationResult.NoQueryOrMutationProvided ->
-        colorprintfn "⚠️  Error while validating query $red[%s]" queryFile
-        colorprintfn "    No query or mutation request were provided"
+        colorprintfn "❌ Error while validating query $red[%s]" queryFile
+        colorprintfn "   No query or mutation request were provided"
         false
     | ValidationResult.QueryErrors errors ->
-        colorprintfn "⚠️  Error while validating query $red[%s]" queryFile
+        colorprintfn "❌ Error while validating query $red[%s]" queryFile
         for error in errors do
             match error with
             | QueryError.UnknownField (fieldName, parent, typeName) ->
@@ -278,7 +278,7 @@ let runConfig (config: Config) =
     | Error errorMessage ->
         colorprintfn "$red[%s]" errorMessage; 1
     | Ok schema ->
-        printfn "✔️  Schema loaded successfully"
+        printfn "✔ Schema loaded successfully"
         colorprintfn "⏳ Validating queries within $green[%s]" config.queries
         let mutable errorCount = 0
         let queryFiles = seq {
@@ -290,7 +290,7 @@ let runConfig (config: Config) =
             let query = File.ReadAllText queryFile
             match Query.parse query with
             | Error parseError ->
-                colorprintf "⚠️ Could not parse query $red[%s]:%s%s%s" queryFile Environment.NewLine parseError Environment.NewLine
+                colorprintf "❌ Could not parse query $red[%s]:%s%s%s" queryFile Environment.NewLine parseError Environment.NewLine
                 errorCount <- errorCount + 1
             | Ok parsedQuery ->
                 if not (validateAndPrint queryFile parsedQuery schema)
@@ -316,7 +316,7 @@ let generate (config: Config) =
     colorprintfn "⏳ Loading GraphQL schema from $green[%s]" config.schema
     match Introspection.loadSchema config.schema with
     | Error errorMessage ->
-        colorprintfn "$red[%s]" errorMessage
+        colorprintfn "{❌}$red[%s]" errorMessage
         Error 1
     | Ok schema ->
         let mutable invalidQuery = false
@@ -330,7 +330,7 @@ let generate (config: Config) =
                 let query = File.ReadAllText queryFile
                 match Query.parse query with
                 | Error parseError ->
-                    colorprintf "⚠️ Could not parse query $red[%s]:%s%s%s" queryFile Environment.NewLine parseError Environment.NewLine
+                    colorprintf "❌ Could not parse query $red[%s]:%s%s%s" queryFile Environment.NewLine parseError Environment.NewLine
                     invalidQuery <- true
                 | Ok query ->
                     invalidQuery <- not (validateAndPrint queryFile query schema)
@@ -744,7 +744,7 @@ let main argv =
         |> Seq.tryFind (fun file -> file.ToLower().EndsWith("snowflaqe.json"))
         |> function
             | None ->
-                colorprintfn "⚠️  No configuration file found. Expecting JSON file $yellow[%s] in the current working directory" "snowflaqe.json"
+                colorprintfn "❌ No configuration file found. Expecting JSON file $yellow[%s] in the current working directory" "snowflaqe.json"
                 1
             | Some configFile ->
                 runConfigFile configFile
@@ -792,7 +792,7 @@ let main argv =
         |> Seq.tryFind (fun file -> file.ToLower().EndsWith("snowflaqe.json"))
         |> function
             | None ->
-                colorprintfn "⚠️  No configuration file found. Expecting JSON file $yellow[%s] in the current working directory" "snowflaqe.json"
+                colorprintfn "❌ No configuration file found. Expecting JSON file $yellow[%s] in the current working directory" "snowflaqe.json"
                 1
             | Some configFile -> generateOrExit configFile
 
