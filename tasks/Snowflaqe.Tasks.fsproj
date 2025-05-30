@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
 
     <NoPackageAnalysis>true</NoPackageAnalysis>
@@ -11,7 +11,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <DevelopmentDependency>true</DevelopmentDependency>
     <MinClientVersion>2.8</MinClientVersion>
-    <Version>1.8.0</Version>
+    <Version>1.8.1-beta7</Version>
     <PackageReleaseNotes>Add warning-generating keyword 'params' to reserved keywords list</PackageReleaseNotes>
   </PropertyGroup>
 
@@ -22,23 +22,7 @@
     </PropertyGroup>
     <Error Text="Unrecognized TargetFramework" Condition=" '$(BuildSubDir)' == '' " />
     <ItemGroup>
-      <TfmSpecificPackageFile Include="
-                              $(OutputPath)Snowflaqe.Tasks.dll*;
-                              $(OutputPath)Snowflaqe.dll*;
-                              $(OutputPath)Fantomas.Core.dll*;
-                              $(OutputPath)Fantomas.FCS.dll*;
-                              $(OutputPath)Microsoft.Build.Tasks.Core.dll*;
-                              $(OutputPath)FSharp.Core.dll*;
-                              $(OutputPath)FSharp.Data.LiteralProviders.Runtime.dll*;
-                              $(OutputPath)GraphQL.dll*;
-                              $(OutputPath)System.Net.Http.Json.dll*;
-                              $(OutputPath)System.Text.Json.dll*;
-                              $(OutputPath)Newtonsoft.Json.dll*;
-                              $(OutputPath)BlackFox.ColoredPrintf.dll*;
-                              $(OutputPath)BlackFox.MasterOfFoo.dll*;
-                              $(OutputPath)GraphQL.NewtonsoftJson.dll*;
-                              $(OutputPath)GraphQLParser.dll*;
-                              ">
+      <TfmSpecificPackageFile Include="&#xD;&#xA;                              $(OutputPath)Snowflaqe.Tasks.dll*;&#xD;&#xA;                              $(OutputPath)Snowflaqe.dll*;&#xD;&#xA;                              $(OutputPath)Fantomas.Core.dll*;&#xD;&#xA;                              $(OutputPath)Fantomas.FCS.dll*;&#xD;&#xA;                              $(OutputPath)Microsoft.Build.Tasks.Core.dll*;&#xD;&#xA;                              $(OutputPath)FSharp.Core.dll*;&#xD;&#xA;                              $(OutputPath)FSharp.Data.LiteralProviders.Runtime.dll*;&#xD;&#xA;                              $(OutputPath)GraphQL.dll*;&#xD;&#xA;                              $(OutputPath)System.Net.Http.Json.dll*;&#xD;&#xA;                              $(OutputPath)System.Text.Json.dll*;&#xD;&#xA;                              $(OutputPath)Newtonsoft.Json.dll*;&#xD;&#xA;                              $(OutputPath)BlackFox.ColoredPrintf.dll*;&#xD;&#xA;                              $(OutputPath)BlackFox.MasterOfFoo.dll*;&#xD;&#xA;                              $(OutputPath)GraphQL.NewtonsoftJson.dll*;&#xD;&#xA;                              $(OutputPath)GraphQLParser.dll*;&#xD;&#xA;                              ">
         <PackagePath>build\$(BuildSubDir)</PackagePath>
       </TfmSpecificPackageFile>
       <!-- Package up the Snowflaqe and its dependencies -->
@@ -77,7 +61,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="6.0.6">
+    <PackageReference Update="FSharp.Core" Version="8.0.403">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; compile; build; native; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
