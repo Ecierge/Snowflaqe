@@ -382,18 +382,22 @@ let createInputRecord (input: GraphqlInputObject) =
 
     let fields = input.fields |> List.filter (fun field -> not field.deprecated)
 
-    let recordRepresentation = SynTypeDefnSimpleReprRecordRcd.Create [
-        for field in fields ->
-            let recordFieldType = createFSharpType None field.fieldType
-            let recordField = SynFieldRcd.Create(field.fieldName |> ensureLegalFieldName, recordFieldType)
-            { recordField with XmlDoc = PreXmlDoc.Create field.description }
-    ]
-
-    let simpleType = SynTypeDefnSimpleReprRcd.Record recordRepresentation
-
-    SynModuleDecl.CreateSimpleType(info, simpleType)
-
-
+    if List.isEmpty fields then
+        // Generate a class type: type <InputType> = class end
+        let classRepr = SynTypeDefnSimpleReprRcd.General {
+            Kind = SynTypeDefnKind.Unspecified
+            Range = Range.range0
+        }
+        SynModuleDecl.CreateSimpleType(info, classRepr)
+    else
+        let recordRepresentation = SynTypeDefnSimpleReprRecordRcd.Create [
+            for field in fields ->
+                let recordFieldType = createFSharpType None field.fieldType
+                let recordField = SynFieldRcd.Create(field.fieldName |> ensureLegalFieldName, recordFieldType)
+                { recordField with XmlDoc = PreXmlDoc.Create field.description }
+        ]
+        let simpleType = SynTypeDefnSimpleReprRcd.Record recordRepresentation
+        SynModuleDecl.CreateSimpleType(info, simpleType)
 
 let createGlobalTypes (schema: GraphqlSchema) (normalizeEnumCases: bool) =
     let enums =

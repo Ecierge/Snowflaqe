@@ -5,10 +5,14 @@ open Expecto
 open Snowflaqe
 open FSharp.Data.LiteralProviders
 
-let [<Literal>] firstSchema = TextFile<"./Introspection.json">.Text
-let [<Literal>] typesFileName = "Types.fs"
+[<Literal>]
+let firstSchema = TextFile<"./Introspection.json">.Text
 
-let query = """
+[<Literal>]
+let typesFileName = "Types.fs"
+
+let query =
+    """
     query getAssets (
       $propertyId: PropertyID!,
       $filter: ObjectListFilter,
@@ -41,41 +45,45 @@ let query = """
       }
     }
 """
-let introspectionTests = testList "Introspection" [
-    test "Timestamptz is converted to DateTimeOffset" {
-        //let parsedSchema = Schema.parse firstSchema
-        //match parsedSchema with
-        //| Error error -> failwithf "Failed to parse the hasura schema:\n%s" error
-        //| Ok schema ->
-        //    let parsedQuery = Query.parse query
-        //    match parsedQuery with
-        //    | Error error -> failwithf "Failed to parse query: %s" error
-        //    | Ok query ->
-        //        let name =
-        //            Query.findOperationName query
-        //            |> Option.defaultValue "DefaultQueryName"
-        //            |> CodeGen.normalizeName
 
-        //        let generated =
-        //            let skipTypeName = false
-        //            let queryTypes = CodeGen.generateTypes "Root" query schema skipTypeName
-        //            let ns = CodeGen.createQualifiedModule [ "Test"; name ] queryTypes
-        //            let file = CodeGen.createFile typesFileName [ ns ]
-        //            CodeGen.formatAst file typesFileName
+let introspectionTests =
+    testList
+        "Introspection"
+        [ test "Timestamptz is converted to DateTimeOffset" {
+              //let parsedSchema = Schema.parse firstSchema
+              //match parsedSchema with
+              //| Error error -> failwithf "Failed to parse the hasura schema:\n%s" error
+              //| Ok schema ->
+              //    let parsedQuery = Query.parse query
+              //    match parsedQuery with
+              //    | Error error -> failwithf "Failed to parse query: %s" error
+              //    | Ok query ->
+              //        let name =
+              //            Query.findOperationName query
+              //            |> Option.defaultValue "DefaultQueryName"
+              //            |> CodeGen.normalizeName
 
-        let schema = Schema.parse firstSchema
+              //        let generated =
+              //            let skipTypeName = false
+              //            let queryTypes = CodeGen.generateTypes "Root" query schema skipTypeName
+              //            let ns = CodeGen.createQualifiedModule [ "Test"; name ] queryTypes
+              //            let file = CodeGen.createFile typesFileName [ ns ]
+              //            CodeGen.formatAst file typesFileName
 
-        match schema with
-        | Error error -> failwith error
-        | Ok schema ->
-            let generated =
-                let normalizeEnumCases = true
-                let globalTypes = CodeGen.createGlobalTypes schema normalizeEnumCases
-                let ns = CodeGen.createNamespace [ "Test" ] globalTypes
-                let file = CodeGen.createFile typesFileName [ ns ]
-                CodeGen.formatAst file typesFileName
+              let schema = Schema.parse firstSchema
 
-            let expected = """namespace rec Test
+              match schema with
+              | Error error -> failwith error
+              | Ok schema ->
+                  let generated =
+                      let normalizeEnumCases = true
+                      let globalTypes = CodeGen.createGlobalTypes schema normalizeEnumCases
+                      let ns = CodeGen.createNamespace [ "Test" ] globalTypes
+                      let file = CodeGen.createFile typesFileName [ ns ]
+                      CodeGen.formatAst file typesFileName
+
+                  let expected =
+                      """namespace rec Test
 
 /// Console login provider
 [<Fable.Core.StringEnum; RequireQualifiedAccess>]
@@ -484,10 +492,10 @@ type PatchWebsiteAsset =
 type ErrorType = { message: string }
 """
 
-            let trimmedGenerated = Utilities.trimContentEnd generated
-            let trimmedExpected = Utilities.trimContentEnd expected
+                  let trimmedGenerated = Utilities.trimContentEnd generated
+                  let trimmedExpected = Utilities.trimContentEnd expected
 
-            Expect.equal trimmedGenerated trimmedExpected "The code is generated correctly"
-    }
+                  Expect.equal trimmedGenerated trimmedExpected "The code is generated correctly"
+          }
 
-  ]
+          ]
