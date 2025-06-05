@@ -23,22 +23,22 @@
     <Error Text="Unrecognized TargetFramework" Condition=" '$(BuildSubDir)' == '' " />
     <ItemGroup>
       <TfmSpecificPackageFile Include="
-                            $(OutputPath)Snowflaqe.Tasks.dll*;
-                            $(OutputPath)Snowflaqe.dll*;
-                            $(OutputPath)Fantomas.Core.dll*;
-                            $(OutputPath)Fantomas.FCS.dll*;
-                            $(OutputPath)Microsoft.Build.Tasks.Core.dll*;
-                            $(OutputPath)FSharp.Core.dll*;
-                            $(OutputPath)FSharp.Data.LiteralProviders.Runtime.dll*;
-                            $(OutputPath)GraphQL.dll*;
-                            $(OutputPath)System.Net.Http.Json.dll*;
-                            $(OutputPath)System.Text.Json.dll*;
-                            $(OutputPath)Newtonsoft.Json.dll*;
-                            $(OutputPath)BlackFox.ColoredPrintf.dll*;
-                            $(OutputPath)BlackFox.MasterOfFoo.dll*;
-                            $(OutputPath)GraphQL.NewtonsoftJson.dll*;
-                            $(OutputPath)GraphQLParser.dll*;
-                            ">
+                              $(OutputPath)Snowflaqe.Tasks.dll*;
+                              $(OutputPath)Snowflaqe.dll*;
+                              $(OutputPath)Fantomas.Core.dll*;
+                              $(OutputPath)Fantomas.FCS.dll*;
+                              $(OutputPath)Microsoft.Build.Tasks.Core.dll*;
+                              $(OutputPath)FSharp.Core.dll*;
+                              $(OutputPath)FSharp.Data.LiteralProviders.Runtime.dll*;
+                              $(OutputPath)GraphQL.dll*;
+                              $(OutputPath)System.Net.Http.Json.dll*;
+                              $(OutputPath)System.Text.Json.dll*;
+                              $(OutputPath)Newtonsoft.Json.dll*;
+                              $(OutputPath)BlackFox.ColoredPrintf.dll*;
+                              $(OutputPath)BlackFox.MasterOfFoo.dll*;
+                              $(OutputPath)GraphQL.NewtonsoftJson.dll*;
+                              $(OutputPath)GraphQLParser.dll*;
+                              ">
         <PackagePath>build\$(BuildSubDir)</PackagePath>
       </TfmSpecificPackageFile>
       <!-- Package up the Snowflaqe and its dependencies -->
