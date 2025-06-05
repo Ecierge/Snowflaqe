@@ -172,7 +172,7 @@ type SynType with
             isPostfix = false,
             range=Range.range0,
             greaterRange=Some Range.range0,
-            lessRange=None
+            lessRange=Some Range.range0
         )
 
     static member Dictionary(key, value) =
@@ -183,7 +183,7 @@ type SynType with
             isPostfix = false,
             range=Range.range0,
             greaterRange=Some Range.range0,
-            lessRange=None
+            lessRange=Some Range.range0
         )
 
     static member Option(inner: string) =
@@ -194,7 +194,7 @@ type SynType with
             isPostfix = false,
             range=Range.range0,
             greaterRange=Some Range.range0,
-            lessRange=None
+            lessRange=Some Range.range0
         )
 
     static member List(inner) =
@@ -205,7 +205,7 @@ type SynType with
             isPostfix = false,
             range=Range.range0,
             greaterRange=Some Range.range0,
-            lessRange=None
+            lessRange=Some Range.range0
         )
 
     static member List(inner: string) =
@@ -216,7 +216,7 @@ type SynType with
             isPostfix = false,
             range=Range.range0,
             greaterRange=Some Range.range0,
-            lessRange=None
+            lessRange=Some Range.range0
         )
 
     static member DateTimeOffset() =
@@ -385,40 +385,19 @@ let createInputRecord (input: GraphqlInputObject) =
     if List.isEmpty fields then
         // Generate a class type: type <InputType>() = inherit obj()
         let members = [
-            //SynMemberDefn.CreateImplicitCtor()
+            SynMemberDefn.CreateImplicitCtor()
             SynMemberDefn.Inherit(SynType.CreateLongIdent "obj()", None, Range.range0)
         ]
-        // Add extra braces by wrapping the type definition in a module or by using a class representation with explicit braces.
-        // In F# AST, the braces are implicit for class types, but you can add a comment or formatting hint if you want to emphasize them.
+        
         let typeDef =
             {   Info = info
-                Repr =  SynTypeDefnRepr.ObjectModel(kind = SynTypeDefnKind.Unspecified, members = [], range = range.Zero)
-                Members = members
-                ImplicitConstructor = Some (SynMemberDefn.CreateImplicitCtor())
+                Repr =  SynTypeDefnRepr.ObjectModel(kind = SynTypeDefnKind.Unspecified, members = members, range = range.Zero)
+                Members = []
+                ImplicitConstructor = None
                 Range = range.Zero
                 Trivia = { SynTypeDefnTrivia.Zero with LeadingKeyword = SynTypeDefnLeadingKeyword.Type range.Zero }
             }
         SynModuleDecl.Types( [typeDef.FromRcd], range0)
-
-        //let typ =
-        //    // Create a class type: type <InputType>() = class end
-        //    let classRepr =
-        //        SynTypeDefnRepr.ObjectModel(
-        //            kind = SynTypeDefnKind.Class,
-        //            members = [
-        //                SynMemberDefn.CreateImplicitCtor()
-        //            ],
-        //            range = range0
-        //        )
-        //    SynTypeDefn(
-        //        typeInfo = info.FromRcd,
-        //        typeRepr = classRepr,
-        //        members = [],
-        //        implicitConstructor = None,
-        //        range = range0,
-        //        trivia = SynTypeDefnTrivia.Zero
-        //    )
-        //SynModuleDecl.Types([ typ ], range0)
     else
         let recordRepresentation = SynTypeDefnSimpleReprRecordRcd.Create [
             for field in fields ->

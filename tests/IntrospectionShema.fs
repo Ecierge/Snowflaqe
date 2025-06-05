@@ -50,26 +50,6 @@ let introspectionTests =
     testList
         "Introspection"
         [ test "Timestamptz is converted to DateTimeOffset" {
-              //let parsedSchema = Schema.parse firstSchema
-              //match parsedSchema with
-              //| Error error -> failwithf "Failed to parse the hasura schema:\n%s" error
-              //| Ok schema ->
-              //    let parsedQuery = Query.parse query
-              //    match parsedQuery with
-              //    | Error error -> failwithf "Failed to parse query: %s" error
-              //    | Ok query ->
-              //        let name =
-              //            Query.findOperationName query
-              //            |> Option.defaultValue "DefaultQueryName"
-              //            |> CodeGen.normalizeName
-
-              //        let generated =
-              //            let skipTypeName = false
-              //            let queryTypes = CodeGen.generateTypes "Root" query schema skipTypeName
-              //            let ns = CodeGen.createQualifiedModule [ "Test"; name ] queryTypes
-              //            let file = CodeGen.createFile typesFileName [ ns ]
-              //            CodeGen.formatAst file typesFileName
-
               let schema = Schema.parse firstSchema
 
               match schema with
@@ -92,8 +72,8 @@ type ConsoleLoginProvider =
     | [<CompiledName "Microsoft365">] Microsoft365
 
 /// The `Filter` scalar type represents a filter on one or more fields of an object in an object list. The filter is represented by a JSON object where the fields are the complemented by specific suffixes to represent a query.
-type ObjectListFilter = class end
-
+type ObjectListFilter() =
+    inherit obj()
 
 type InputUser =
     { loginProvider: ConsoleLoginProvider
@@ -488,8 +468,6 @@ type PatchWebsiteAsset =
       notes: Option<string>
       supplierId: Option<string> }
 
-/// The error returned by the GraphQL backend
-type ErrorType = { message: string }
 """
 
                   let trimmedGenerated = Utilities.trimContentEnd generated
