@@ -2,11 +2,21 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="**\*.json" />
+    <None Remove="bin\**\*.json" />
+    <None Remove="obj\**\*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="Utilities.fs" />
+    <Compile Include="IntrospectionShema.fs" />
     <Compile Include="SampleHasuraSchema.fs" />
     <Compile Include="SampleGithubSchema.fs" />
     <Compile Include="SampleCraftSchema.fs" />
@@ -18,6 +28,8 @@
 
   <ItemGroup>
     <PackageReference Include="Expecto" Version="9.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.13.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="6.0.6" />
+    <PackageReference Update="FSharp.Core" Version="8.0.403" />
   </ItemGroup>
 
 </Project>

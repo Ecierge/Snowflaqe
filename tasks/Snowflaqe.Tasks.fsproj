@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
 
     <NoPackageAnalysis>true</NoPackageAnalysis>
@@ -11,7 +11,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <DevelopmentDependency>true</DevelopmentDependency>
     <MinClientVersion>2.8</MinClientVersion>
-    <Version>1.8.0</Version>
+    <Version>1.8.1-beta7</Version>
     <PackageReleaseNotes>Add warning-generating keyword 'params' to reserved keywords list</PackageReleaseNotes>
   </PropertyGroup>
 
@@ -77,7 +77,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="6.0.6">
+    <PackageReference Update="FSharp.Core" Version="8.0.403">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; compile; build; native; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

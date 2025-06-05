@@ -382,18 +382,31 @@ let createInputRecord (input: GraphqlInputObject) =
 
     let fields = input.fields |> List.filter (fun field -> not field.deprecated)
 
-    let recordRepresentation = SynTypeDefnSimpleReprRecordRcd.Create [
-        for field in fields ->
-            let recordFieldType = createFSharpType None field.fieldType
-            let recordField = SynFieldRcd.Create(field.fieldName |> ensureLegalFieldName, recordFieldType)
-            { recordField with XmlDoc = PreXmlDoc.Create field.description }
-    ]
-
-    let simpleType = SynTypeDefnSimpleReprRcd.Record recordRepresentation
-
-    SynModuleDecl.CreateSimpleType(info, simpleType)
-
-
+    if List.isEmpty fields then
+        // Generate a class type: type <InputType>() = inherit obj()
+        let members = [
+            SynMemberDefn.CreateImplicitCtor()
+            SynMemberDefn.Inherit(SynType.CreateLongIdent "obj()", None, Range.range0)
+        ]
+        
+        let typeDef =
+            {   Info = info
+                Repr =  SynTypeDefnRepr.ObjectModel(kind = SynTypeDefnKind.Unspecified, members = members, range = range.Zero)
+                Members = []
+                ImplicitConstructor = None
+                Range = range.Zero
+                Trivia = { SynTypeDefnTrivia.Zero with LeadingKeyword = SynTypeDefnLeadingKeyword.Type range.Zero }
+            }
+        SynModuleDecl.Types( [typeDef.FromRcd], range0)
+    else
+        let recordRepresentation = SynTypeDefnSimpleReprRecordRcd.Create [
+            for field in fields ->
+                let recordFieldType = createFSharpType None field.fieldType
+                let recordField = SynFieldRcd.Create(field.fieldName |> ensureLegalFieldName, recordFieldType)
+                { recordField with XmlDoc = PreXmlDoc.Create field.description }
+        ]
+        let simpleType = SynTypeDefnSimpleReprRcd.Record recordRepresentation
+        SynModuleDecl.CreateSimpleType(info, simpleType)
 
 let createGlobalTypes (schema: GraphqlSchema) (normalizeEnumCases: bool) =
     let enums =
@@ -414,7 +427,6 @@ let createGlobalTypes (schema: GraphqlSchema) (normalizeEnumCases: bool) =
         |> List.map createInputRecord
 
     List.append enums inputs
-
 
 let nextTick (name: string) (visited: ResizeArray<string>) =
     if not (visited.Contains name) then

@@ -1336,6 +1336,7 @@ let customScalarsTests =
     }
 ]
 
+[<Tests>]
 let snowflakeTests = testList "Snowflaqe" [
     queryParsing
     customScalarsTests
@@ -1345,6 +1346,7 @@ let snowflakeTests = testList "Snowflaqe" [
     SamplePostgraphile.tests
     SampleSentiantSchema.tests
     SampleSyntheticInputSchema.tests
+    IntrospectionShema.introspectionTests
 ]
 
 [<EntryPoint>]
