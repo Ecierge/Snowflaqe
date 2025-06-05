@@ -396,6 +396,28 @@ let createInputRecord (input: GraphqlInputObject) =
         // Add extra braces by wrapping the type definition in a module or by using a class representation with explicit braces.
         // In F# AST, the braces are implicit for class types, but you can add a comment or formatting hint if you want to emphasize them.
         SynModuleDecl.Types([typeDef.FromRcd], range0)
+        //let members = [
+        //    SynMemberDefn.CreateImplicitCtor()
+        //    SynMemberDefn.Inherit(SynType.CreateLongIdent "obj", None, Range.range0)
+        //]
+        //let typeDef =
+        //    SynTypeDefnRcd.Create(
+        //        info,
+        //        members
+        //    )
+        //// Add extra braces by wrapping the type definition in a module or by using a class representation with explicit braces.
+        //// In F# AST, the braces are implicit for class types, but you can add a comment or formatting hint if you want to emphasize them.
+        //SynModuleDecl.Types([typeDef.FromRcd], range0)
+
+        let classRepr :SynTypeDefnSimpleReprGeneralRcd =
+                { 
+                    Kind = SynTypeDefnKind.Class
+                    Range = range0
+                }
+        let simpleType =
+            SynTypeDefnSimpleReprRcd.General(classRepr)  
+                
+        SynModuleDecl.CreateSimpleType(info, simpleType)
 
         //let typ =
         //    // Create a class type: type <InputType>() = class end
