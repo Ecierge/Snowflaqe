@@ -428,9 +428,6 @@ let createGlobalTypes (schema: GraphqlSchema) (normalizeEnumCases: bool) =
 
     List.append enums inputs
 
-
-
-
 let nextTick (name: string) (visited: ResizeArray<string>) =
     if not (visited.Contains name) then
         name
