@@ -18,7 +18,7 @@ let src = path [ solutionRoot; "src" ]
 let tests = path [ solutionRoot; "tests" ]
 let tasks = path [ solutionRoot; "tasks" ]
 
-let [<Literal>] TargetFramework = "net6.0"
+let [<Literal>] TargetFramework = "net8.0"
 
 let test() =
     if Shell.Exec(Tools.dotnet, "run", tests) <> 0
@@ -159,7 +159,7 @@ let generateProjectFile (imports: string seq) (defaultTargets: string option) (t
                 yield! imports |> Seq.map (fun path -> MSBuildXElement.Import(path) :> obj)
                 yield XElement.ofStringName("PropertyGroup",
                         XElement.ofStringName("OutputType", "Exe"),
-                        XElement.ofStringName("TargetFramework", "net6.0")) :> obj
+                        XElement.ofStringName("TargetFramework", "net8.0")) :> obj
                 yield! targets |> Seq.map (fun target -> MSBuildXElement.Target(target) :> obj)
             }))
 
@@ -185,7 +185,7 @@ let generateProjectFileForTask (targetFrameworks : string list) (package :MSBuil
                 yield XElement.ofStringName("PropertyGroup",
                         XElement.ofStringName("OutputType", "Exe"),
                         match targetFrameworks with
-                        | [] -> XElement.ofStringName("TargetFramework", "net6.0")
+                        | [] -> XElement.ofStringName("TargetFramework", "net8.0")
                         | [head] -> XElement.ofStringName("TargetFramework", head)
                         | frameworks -> XElement.ofStringName("TargetFrameworks", frameworks |> String.concat(";"))
                 ) :> obj
@@ -216,7 +216,7 @@ let createProjectFileAndRun imports (projectFileName : string) =
 let createProjectFileForTaskAndRun (directory: string) (project : string) (package :MSBuildPackageReference list) (schema : string) (target : string) (queries : string) =
     let projectFileName = project + ".fsproj"
     let project = generateProjectFileForTask
-                    [ "net6.0" ]
+                    [ "net8.0" ]
                     package
                     project
                     schema
@@ -232,7 +232,7 @@ let createProjectFileForTaskAndRun (directory: string) (project : string) (packa
 let createMultiFrameworkProjectFileForTaskAndRun (directory: string) (project : string)  (packages :MSBuildPackageReference list) (schema : string) (target : string) (queries : string) =
     let projectFileName = project + ".fsproj"
     let project = generateProjectFileForTask
-                    [ "netcoreapp3.1"; "net6.0" ]
+                    [ "net8.0" ]
                     packages
                     project
                     schema
@@ -247,7 +247,7 @@ let createMultiFrameworkProjectFileForTaskAndRun (directory: string) (project : 
 let createProjectFileAndRebuild (directory: string) (project : string) (packages :MSBuildPackageReference list) (schema: string) (target: string) (queries: string) =
     let projectFileName = project + ".fsproj"
     let project = generateProjectFileForTask
-                    [ "net6.0" ]
+                    [ "net8.0" ]
                     packages
                     project
                     schema
@@ -264,7 +264,7 @@ let tasksIntegration() =
     let generateGQLClientTask =
         { Name = "GenerateGraphQLClient"
           FullName = "Snowflaqe.Tasks.GenerateGraphQLClient"
-          AssemblyFile = path [ solutionRoot; "tasks"; "bin"; "Release"; "net6.0"; "Snowflaqe.Tasks.dll" ]
+          AssemblyFile = path [ solutionRoot; "tasks"; "bin"; "Release"; "net8.0"; "Snowflaqe.Tasks.dll" ]
           Parameters =
             seq {
                 KeyValuePair("Output", path [ solutionRoot; "src"; "output"] :> obj)
@@ -334,7 +334,7 @@ let multiFrameworkTasksIntegration() =
     let generateGQLClientTask =
         { Name = "GenerateGraphQLClient"
           FullName = "Snowflaqe.Tasks.GenerateGraphQLClient"
-          AssemblyFile = path [ solutionRoot; "tasks"; "bin"; "Release"; "net6.0"; "Snowflaqe.Tasks.dll" ]
+          AssemblyFile = path [ solutionRoot; "tasks"; "bin"; "Release"; "net8.0"; "Snowflaqe.Tasks.dll" ]
           Parameters =
             seq {
                 KeyValuePair("Output", path [ solutionRoot; "src"; "output"] :> obj)
@@ -545,7 +545,7 @@ let main (args: string[]) =
         | [| "publish" |] -> publish()
         | [| "publish-tasks" |] -> publishTasks()
         | [| "integration" |] -> integration()
-        | [| "fsproj-integration" |] -> 
+        | [| "fsproj-integration" |] ->
             clear()
             fsprojIntegration()
             clear()
