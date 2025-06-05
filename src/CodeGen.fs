@@ -383,41 +383,22 @@ let createInputRecord (input: GraphqlInputObject) =
     let fields = input.fields |> List.filter (fun field -> not field.deprecated)
 
     if List.isEmpty fields then
-        // Generate a class type: type <InputType>() = inherit obj() 
+        // Generate a class type: type <InputType>() = inherit obj()
         let members = [
-            SynMemberDefn.CreateImplicitCtor()
-            SynMemberDefn.Inherit(SynType.CreateLongIdent "obj", None, Range.range0)
+            //SynMemberDefn.CreateImplicitCtor()
+            SynMemberDefn.Inherit(SynType.CreateLongIdent "obj()", None, Range.range0)
         ]
-        let typeDef =
-            SynTypeDefnRcd.Create(
-                info,
-                members
-            )
         // Add extra braces by wrapping the type definition in a module or by using a class representation with explicit braces.
         // In F# AST, the braces are implicit for class types, but you can add a comment or formatting hint if you want to emphasize them.
-        SynModuleDecl.Types([typeDef.FromRcd], range0)
-        //let members = [
-        //    SynMemberDefn.CreateImplicitCtor()
-        //    SynMemberDefn.Inherit(SynType.CreateLongIdent "obj", None, Range.range0)
-        //]
-        //let typeDef =
-        //    SynTypeDefnRcd.Create(
-        //        info,
-        //        members
-        //    )
-        //// Add extra braces by wrapping the type definition in a module or by using a class representation with explicit braces.
-        //// In F# AST, the braces are implicit for class types, but you can add a comment or formatting hint if you want to emphasize them.
-        //SynModuleDecl.Types([typeDef.FromRcd], range0)
-
-        let classRepr :SynTypeDefnSimpleReprGeneralRcd =
-                { 
-                    Kind = SynTypeDefnKind.Class
-                    Range = range0
-                }
-        let simpleType =
-            SynTypeDefnSimpleReprRcd.General(classRepr)  
-                
-        SynModuleDecl.CreateSimpleType(info, simpleType)
+        let typeDef =
+            {   Info = info
+                Repr =  SynTypeDefnRepr.ObjectModel(kind = SynTypeDefnKind.Unspecified, members = [], range = range.Zero)
+                Members = members
+                ImplicitConstructor = Some (SynMemberDefn.CreateImplicitCtor())
+                Range = range.Zero
+                Trivia = { SynTypeDefnTrivia.Zero with LeadingKeyword = SynTypeDefnLeadingKeyword.Type range.Zero }
+            }
+        SynModuleDecl.Types( [typeDef.FromRcd], range0)
 
         //let typ =
         //    // Create a class type: type <InputType>() = class end
