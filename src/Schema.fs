@@ -202,10 +202,13 @@ let (|Interface|_|)  (typeJson: JToken) =
             )
 
         let possibleTypes =
-            if isNull typeJson.["possibleTypes"] then
+            let possibleTypes = typeJson.["possibleTypes"]
+            if isNull possibleTypes then
                 [ ]
+            elif isNull (possibleTypes :?> JArray) then
+                raise (Newtonsoft.Json.JsonException "'possibleTypes' is not array")
             else
-                [ for possibleType in unbox<JArray> typeJson.["possibleTypes"] do
+                [ for possibleType in unbox<JArray> possibleTypes do
                     yield possibleType.["name"].ToString() ]
         Some {
             name = name
@@ -223,10 +226,13 @@ let (|Union|_|) (typeJson: JToken) =
         let name = typeJson.["name"].ToString()
         let description = stringOrNone typeJson "description" |> normalizeComment
         let possibleTypes =
-            if isNull typeJson.["possibleTypes"] then
+            let possibleTypes = typeJson.["possibleTypes"]
+            if isNull possibleTypes then
                 [ ]
+            elif isNull (possibleTypes :?> JArray) then
+                raise (Newtonsoft.Json.JsonException "'possibleTypes' is not array")
             else
-                [ for possibleType in unbox<JArray> typeJson.["possibleTypes"] do
+                [ for possibleType in unbox<JArray> possibleTypes do
                     yield possibleType.["name"].ToString() ]
 
         Some {
