@@ -1,76 +1,100 @@
-﻿<Project >
-    <PropertyGroup>
-        <BuildDependsOn>
-            GenerateGraphQLClient;
-            $(BuildDependsOn)
-        </BuildDependsOn>
-    </PropertyGroup>
-    <PropertyGroup>
-        <_SourceGeneratorCacheFile>$(IntermediateOutputPath)\g\generation.cache</_SourceGeneratorCacheFile>
-    </PropertyGroup>
+﻿<Project>
     <ItemGroup>
-        <SourceGeneratorInput Include="@(Compile)" />
-        <SourceGeneratorInput Include="@(Content)" />
-        <SourceGeneratorInput Include="@(None)" />
+        <AvailableItemName Include="SnowflaqeSchema" />
+        <AvailableItemName Include="SnowflaqeOperation" />
     </ItemGroup>
 
-    <Target Name="_InjectGeneratedFiles"
-                   BeforeTargets="ResolveNuGetPackageAssets;BeforeCompile"
-                   Condition="('$(BuildingProject)' == 'false' or '$(DesignTimeBuild)' == 'true') and '$(MSBuildProjectExtension)'=='.fsproj'">
-
-        <!--This target is used to temporarily include generated files to help IntelliSense
-    make sense of generated code.-->
-        <ReadLinesFromFile File="$(_SourceGeneratorCacheFile)">
-            <Output TaskParameter="Lines" ItemName="GeneratedFilesCachedItems"/>
-        </ReadLinesFromFile>
-        <ItemGroup>
-            <_OriginCompile Include="@(Compile)" />
-            <Compile Remove="@(_OriginCompile)"/>
-            <Compile Include="@(GeneratedFilesCachedItems)"/>
-            <Compile Include="@(_OriginCompile)"/>
-            <_OriginCompile Remove="@(_OriginCompile)" />
-            <!--Inform tooling & IDE of new files to process (mostly for IntelliSense)-->
-            <_GeneratedCodeFiles Include="@(GeneratedFilesCachedItems)" />
-        </ItemGroup>
-    </Target>
+    <PropertyGroup>
+        <BuildDependsOn>
+            SnowflaqeGenerateGraphQLClient;
+            $(BuildDependsOn)
+        </BuildDependsOn>
+        <GetTargetPathDependsOn>
+            SnowflaqeGenerateGraphQLClient;
+            $(GetTargetPathDependsOn)
+        </GetTargetPathDependsOn>
+        <_SnowflaqeSourceGeneratorCacheFile>$(IntermediateOutputPath)g\generation.cache</_SnowflaqeSourceGeneratorCacheFile>
+    </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Fable.Remoting.Json" Version="2.14.*" Condition="$(SnowflaqeTarget) == 'fable'" />
     </ItemGroup>
+
     <PropertyGroup>
-        <TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' ">MSBuildCore</TaskFolder>
-        <TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">MSBuildFull</TaskFolder>
-        <TaskAssembly>$(MSBuildThisFileDirectory)..\build\$(TaskFolder)\Snowflaqe.Tasks.dll</TaskAssembly>
+        <_ShowflaqeTaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' ">MSBuildCore</_ShowflaqeTaskFolder>
+        <_ShowflaqeTaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">MSBuildFull</_ShowflaqeTaskFolder>
+        <TaskAssembly>$(MSBuildThisFileDirectory)..\build\$(_ShowflaqeTaskFolder)\Snowflaqe.Tasks.dll</TaskAssembly>
     </PropertyGroup>
+
     <UsingTask
         TaskName="Snowflaqe.Tasks.GenerateGraphQLClient"
         AssemblyFile="$(TaskAssembly)" />
 
-    <Target Name="GenerateGraphQLClient" BeforeTargets="BeforeReBuild" Outputs="$(_SourceGeneratorCacheFile)">
+    <!-- Ensure cache file exists before trying to read it -->
+    <Target Name="_EnsureCacheFileExists"
+            Condition="!Exists('$(_SnowflaqeSourceGeneratorCacheFile)')">
+        <CallTarget Targets="SnowflaqeGenerateGraphQLClient" />
+    </Target>
+
+    <Target Name="_InjectGeneratedFiles"
+            BeforeTargets="ResolveNuGetPackageAssets;BeforeCompile"
+            DependsOnTargets="_EnsureCacheFileExists"
+            Condition="'$(MSBuildProjectExtension)'=='.fsproj'">
+
+        <!-- This target is used to temporarily include generated files to help IntelliSense make sense of generated code. -->
+        <ReadLinesFromFile File="$(_SnowflaqeSourceGeneratorCacheFile)" ContinueOnError="true">
+            <Output TaskParameter="Lines" ItemName="GeneratedFilesCachedItems"/>
+        </ReadLinesFromFile>
+
+        <ItemGroup>
+            <_GeneratedFilesToInclude Include="@(GeneratedFilesCachedItems)" />
+        </ItemGroup>
+
+        <ItemGroup>
+            <_OriginCompile Include="@(Compile)" />
+            <Compile Remove="@(_OriginCompile)" />
+            <Compile Remove="@(GeneratedFilesCachedItems)" Condition="'@(GeneratedFilesCachedItems)' != ''" />
+            <Compile Include="@(_GeneratedFilesToInclude)" Condition="'@(_GeneratedFilesToInclude)' != ''" />
+            <Compile Include="@(_OriginCompile)" />
+            <_OriginCompile Remove="@(_OriginCompile)" />
+            <_GeneratedCodeFiles Include="@(_GeneratedFilesToInclude)" Condition="'@(_GeneratedFilesToInclude)' != ''" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="SnowflaqeGenerateGraphQLClient"
+            BeforeTargets="BeforeCompile"
+            Inputs="$(MSBuildProjectFullPath);@(SnowflaqeSchema);@(SnowflaqeOperation);$(TaskAssembly)"
+            Outputs="$(_SnowflaqeSourceGeneratorCacheFile)">
+
         <GenerateGraphQLClient
-                OutputPath="$(IntermediateOutputPath)\g"
+                OutputPath="$(IntermediateOutputPath)g"
                 Project="$(SnowflaqeProjectName)"
                 Queries="$(SnowflaqeQueriesFolder)"
-                Schema="$(SnowflaqeSchemaPath)"
+                Schema="@(SnowflaqeSchema)"
                 Configuration="$(Configuration)"
                 Platform="$(Platform)"
                 Target="$(SnowflaqeTargetProjectType)">
             <Output TaskParameter="GeneratedFiles" ItemName="SnowflaqeGeneratedFiles" />
         </GenerateGraphQLClient>
-        <Message Text="Generated files:" Importance="high" />
-        <Message Text="@(SnowflaqeGeneratedFiles)" />
-        <Message Text="@(DesignTimeBuild)" />
+
+        <Message Text="Generated files: @(SnowflaqeGeneratedFiles)" Importance="Normal" />
+
+        <ItemGroup>
+            <_GeneratedFilesToInclude Include="@(SnowflaqeGeneratedFiles)" />
+        </ItemGroup>
+
         <ItemGroup>
             <_OriginCompile Include="@(Compile)" />
-            <Compile Remove="@(_OriginCompile)"/>
-            <Compile Remove="@(GeneratedFilesCachedItems)"/>
-            <Compile Include="@(SnowflaqeGeneratedFiles)"/>
-            <Compile Include="@(_OriginCompile)"/>
+            <Compile Remove="@(_OriginCompile)" />
+            <Compile Remove="@(GeneratedFilesCachedItems)" Condition="'@(GeneratedFilesCachedItems)' != ''" />
+            <Compile Include="@(_GeneratedFilesToInclude)" Condition="'@(_GeneratedFilesToInclude)' != ''" />
+            <Compile Include="@(_OriginCompile)" />
             <_OriginCompile Remove="@(_OriginCompile)" />
-            <_GeneratedCodeFiles Include="@(GeneratedFilesCachedItems)" />
+            <_GeneratedCodeFiles Include="@(_GeneratedFilesToInclude)" Condition="'@(_GeneratedFilesToInclude)' != ''" />
         </ItemGroup>
+
         <WriteLinesToFile
-            File="$(_SourceGeneratorCacheFile)"
+            File="$(_SnowflaqeSourceGeneratorCacheFile)"
             Lines="@(SnowflaqeGeneratedFiles)"
             Overwrite="true" />
     </Target>
